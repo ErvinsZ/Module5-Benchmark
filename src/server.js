@@ -6,7 +6,10 @@ const server = express()
 
 const port = process.env.PORT || 3001
 
+server.use(express.json())
+
 server.use("/movies",moviesRouter)
+
 
 console.log(listEndpoints(server))
 

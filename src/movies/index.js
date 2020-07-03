@@ -1,5 +1,6 @@
 const express = require("express")
 const path = require("path")
+const fs = require("fs-extra")
 const readFile = require('../utilities')
 
 const moviesRouter = express.Router()
@@ -19,9 +20,18 @@ moviesRouter.get("/:movieimdbID", (req, res) => {
     console.log(movieFound)
     res.send("OK")
 })
+
 moviesRouter.post("/", (req, res) => {
+    const newMovie = {...req.body, createdAt:new Date()}
+    console.log(newMovie)
+
+    const arrayOfMovies = readFile(moviesFolderPath)
+    arrayOfMovies.push(newMovie)
+    fs.writeFileSync(moviesFolderPath, JSON.stringify(arrayOfMovies))
+
     res.send("OK")
 })
+
 moviesRouter.put("/:id", (req, res) => {
     res.send("OK")
 })
