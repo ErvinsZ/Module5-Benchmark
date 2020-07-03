@@ -2,6 +2,7 @@ const express = require("express")
 const path = require("path")
 const fs = require("fs-extra")
 const readFile = require('../utilities')
+const { response } = require("express")
 
 const moviesRouter = express.Router()
 
@@ -33,10 +34,29 @@ moviesRouter.post("/", (req, res) => {
 })
 
 moviesRouter.put("/:id", (req, res) => {
+    
+    const arrayOfMovies = readFile(moviesFolderPath)
+    const movieIndex = arrayOfMovies.map(x =>x.imbdID).indexOf(req.params.imbdID)
+    if (movieIndex === -1)
+    return res.status(404).send("NOT FOUND")
+
+    arrayOfMovies[movieIndex]= {
+        ...arrayOfMovies[movieIndex],
+        ...req.body
+    }
+
+    fs.writeFileSync(moviesFolderPath, JSON.stringify(arrayOfMovies))
+    res.status(201).send(arrayOfMovies[movieIndex])
     res.send("OK")
 })
 moviesRouter.delete("/:id", (req, res) => {
-    res.send("OK")
+    const arrayOfMovies = readFile(moviesFolderPath)
+    const excluded = arrayOfMovies.filter(movie => movie.imbdID !== req.params.imbdID)
+    if (arrayOfMovies.length === excluded.length)
+    return res.status(404).send("Movie not Found")
+
+    fs.writeFileSync(moviesFolderPath, JSON.stringify(excluded))
+    res.send("Deleted")
 })
 
 module.exports = moviesRouter
