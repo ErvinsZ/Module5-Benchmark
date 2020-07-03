@@ -3,10 +3,13 @@ const path = require("path")
 const fs = require("fs-extra")
 const readFile = require('../utilities')
 const { response } = require("express")
+const { writeFileSync } = require("fs-extra")
 
 const moviesRouter = express.Router()
 
 const moviesFolderPath = path.join(__dirname, "movies.json")
+
+const reviewsFolderPath = path.join(__dirname, "reviews.json")
 
 moviesRouter.get("/", (req, res) => {
 
@@ -58,5 +61,19 @@ moviesRouter.delete("/:id", (req, res) => {
     fs.writeFileSync(moviesFolderPath, JSON.stringify(excluded))
     res.send("Deleted")
 })
+
+
+moviesRouter.post("/:id/reviews", (req, res)=>{
+    const arrayOfMovies = readFile(moviesFolderPath)
+    const movieFound = arrayOfMovies.find((movie) => movie.imdbID ===req.params.movieimdbID)
+    if (arrayOfMovies) {
+        const reviews = readFile(reviewsFolderPath)
+        reviews.push({...req.body, createdAt: newDate(), movieID: req.params.imdbID})
+        fs.writeFileSync(reviewsFolderPath, reviews)
+        res.send("Review posted")
+    }
+
+}
+)
 
 module.exports = moviesRouter
