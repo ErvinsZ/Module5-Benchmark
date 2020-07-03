@@ -4,6 +4,7 @@ const fs = require("fs-extra")
 const readFile = require('../utilities')
 const { response } = require("express")
 const { writeFileSync } = require("fs-extra")
+const uniqid = require("uniqid")
 
 const moviesRouter = express.Router()
 
@@ -54,9 +55,9 @@ moviesRouter.put("/:id", (req, res) => {
 })
 moviesRouter.delete("/:id", (req, res) => {
     const arrayOfMovies = readFile(moviesFolderPath)
-    const excluded = arrayOfMovies.filter(movie => movie.imbdID !== req.params.imbdID)
-    if (arrayOfMovies.length === excluded.length)
-    return res.status(404).send("Movie not Found")
+    const excluded = arrayOfMovies.filter(movie => movie.imdbID !== req.params.imdbID)
+    //if (arrayOfMovies.length === excluded.length)
+    //return res.status(404).send("Movie not Found")
 
     fs.writeFileSync(moviesFolderPath, JSON.stringify(excluded))
     res.send("Deleted")
@@ -67,11 +68,17 @@ moviesRouter.post("/:id/reviews", (req, res)=>{
     const arrayOfMovies = readFile(moviesFolderPath)
     const movieFound = arrayOfMovies.find((movie) => movie.imdbID ===req.params.movieimdbID)
     if (arrayOfMovies) {
+        const newReview = {...req.body, id: uniqid(),createdAt: new Date()}
         const reviews = readFile(reviewsFolderPath)
-        reviews.push({...req.body, createdAt: newDate(), movieID: req.params.imdbID})
+        reviews.push(newReview)
         fs.writeFileSync(reviewsFolderPath, reviews)
         res.send("Review posted")
     }
+
+moviesRouter.get("/:id/reviews", (req, res) =>{
+    const reviews = readFile(reviewsFolderPath)
+    res.send(reviews.filter(review => review.elementId === req.params.imdbID))
+})
 
 }
 )
