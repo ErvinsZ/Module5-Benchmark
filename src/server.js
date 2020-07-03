@@ -1,12 +1,12 @@
 const express = require("express")
 const listEndpoints = require("express-list-endpoints")
-const movieRouter = (require('./movies'))
+const moviesRouter = (require('./movies'))
 
 const server = express()
 
 const port = process.env.PORT || 3001
 
-server.use("/movies",movieRouter)
+server.use("/movies",moviesRouter)
 
 console.log(listEndpoints(server))
 
